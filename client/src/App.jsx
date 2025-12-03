@@ -74,7 +74,7 @@ function App() {
     setLoading(true);
     setError(null);
     try {
-      let url = `http://localhost:5001/api/weather`;
+      let url = `/api/weather`;
       if (typeof query === 'string') {
         url += `?city=${query}`;
       } else if (typeof query === 'object' && query.lat && query.lon) {
@@ -96,7 +96,7 @@ function App() {
       const { coord } = weatherRes.data;
       if (coord) {
         try {
-          const aqiRes = await axios.get(`http://localhost:5001/api/air_quality?lat=${coord.lat}&lon=${coord.lon}`);
+          const aqiRes = await axios.get(`/api/air_quality?lat=${coord.lat}&lon=${coord.lon}`);
           setAqi(aqiRes.data);
         } catch (aqiErr) {
           console.error('Failed to fetch AQI', aqiErr);
@@ -107,7 +107,7 @@ function App() {
       // For forecast, we need the city name from the weather response if we searched by coords,
       // OR we can pass coords to forecast endpoint too.
       // Let's pass coords to forecast endpoint if available.
-      let forecastUrl = `http://localhost:5001/api/forecast`;
+      let forecastUrl = `/api/forecast`;
       if (typeof query === 'string') {
         forecastUrl += `?city=${query}`;
       } else if (typeof query === 'object' && query.lat && query.lon) {

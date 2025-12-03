@@ -151,6 +151,10 @@ app.get('/api/air_quality', async (req, res) => {
     }
 });
 
-app.listen(port, () => {
-    console.log(`Server v2 running on port ${port}`);
-});
+if (require.main === module) {
+    app.listen(port, () => {
+        console.log(`Server v2 running on port ${port}`);
+    });
+}
+
+module.exports = app;
