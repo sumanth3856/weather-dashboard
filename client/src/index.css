@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans antialiased transition-colors duration-300;
+  min-height: 100vh;
+}
+
+.dark body {
+  background: radial-gradient(circle at 50% 0%, #1e293b 0%, #020617 100%);
+}
+
+/* Ethereal / Glass Utilities */
+.glass-panel {
+  @apply bg-white/60 dark:bg-white/5 backdrop-blur-md border border-black/5 dark:border-white/10 rounded-2xl shadow-xl dark:shadow-2xl transition-all duration-300;
+}
+
+.glass-panel:hover {
+  @apply bg-white/80 dark:bg-white/10 border-black/10 dark:border-white/20 transform scale-[1.01];
+}
+
+.minimal-btn {
+  @apply px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 transition-all duration-300 font-medium text-sm;
+}
+
+.active-btn {
+  @apply bg-white/20 border-white/30 text-white shadow-lg shadow-white/10;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-white/10 rounded-full hover:bg-white/20;
+}
