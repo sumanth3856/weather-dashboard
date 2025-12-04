@@ -10,7 +10,7 @@ const Settings = ({ unit, onToggleUnit, theme, onToggleTheme }) => {
                 <div className="flex items-center justify-between">
                     <div>
                         <h3 className="text-lg font-medium text-slate-900 dark:text-white">Temperature Unit</h3>
-                        <p className="text-slate-500 dark:text-slate-400 text-sm">Choose between Celsius and Fahrenheit</p>
+                        <p className="text-slate-700 dark:text-slate-400 text-sm">Choose between Celsius and Fahrenheit</p>
                     </div>
                     <UnitToggle unit={unit} onToggle={onToggleUnit} />
                 </div>
@@ -18,7 +18,7 @@ const Settings = ({ unit, onToggleUnit, theme, onToggleTheme }) => {
                 <div className="border-t border-black/5 dark:border-white/5 pt-6 flex items-center justify-between">
                     <div>
                         <h3 className="text-lg font-medium text-slate-900 dark:text-white">Dark Mode</h3>
-                        <p className="text-slate-500 dark:text-slate-400 text-sm">Toggle application theme</p>
+                        <p className="text-slate-700 dark:text-slate-400 text-sm">Toggle application theme</p>
                     </div>
                     <button
                         onClick={onToggleTheme}
@@ -31,7 +31,7 @@ const Settings = ({ unit, onToggleUnit, theme, onToggleTheme }) => {
                 <div className="border-t border-black/5 dark:border-white/5 pt-6 flex items-center justify-between opacity-50 cursor-not-allowed">
                     <div>
                         <h3 className="text-lg font-medium text-slate-900 dark:text-white">Notifications</h3>
-                        <p className="text-slate-500 dark:text-slate-400 text-sm">Enable weather alerts</p>
+                        <p className="text-slate-700 dark:text-slate-400 text-sm">Enable weather alerts</p>
                     </div>
                     <div className="w-12 h-6 bg-slate-700 rounded-full relative">
                         <div className="absolute left-1 top-1 w-4 h-4 bg-slate-400 rounded-full"></div>
@@ -39,7 +39,7 @@ const Settings = ({ unit, onToggleUnit, theme, onToggleTheme }) => {
                 </div>
             </div>
 
-            <div className="text-center text-slate-500 text-xs mt-12">
+            <div className="text-center text-slate-700 text-xs mt-12">
                 <p>WeatherBun v1.0.0</p>
                 <p>© 2025 WeatherBun Inc.</p>
             </div>

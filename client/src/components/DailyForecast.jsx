@@ -34,14 +34,14 @@ const DailyForecast = ({ data, unit }) => {
 
                     return (
                         <div key={item.dt} className="flex flex-col items-center p-3 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 transition-colors border border-transparent hover:border-black/5 dark:hover:border-white/5">
-                            <span className="text-slate-500 dark:text-slate-400 text-sm font-medium mb-2">{dayName}</span>
+                            <span className="text-slate-700 dark:text-slate-400 text-sm font-medium mb-2">{dayName}</span>
                             <img
                                 src={`https://openweathermap.org/img/wn/${item.weather[0].icon}.png`}
                                 alt={item.weather[0].description}
                                 className="w-10 h-10 mb-2"
                             />
                             <span className="text-slate-900 dark:text-white font-bold text-lg">{temp}{unitSymbol}</span>
-                            <span className="text-xs text-slate-500 capitalize mt-1">{item.weather[0].main}</span>
+                            <span className="text-xs text-slate-700 capitalize mt-1">{item.weather[0].main}</span>
                         </div>
                     );
                 })}

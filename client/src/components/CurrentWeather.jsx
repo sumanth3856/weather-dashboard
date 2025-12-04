@@ -19,7 +19,7 @@ const CurrentWeather = ({ data, unit, isFavorite, onToggleFavorite }) => {
                         <h2 className="text-xl font-light text-slate-900 dark:text-white flex items-center gap-2">
                             {name}, <span className="opacity-60">{sys.country}</span>
                         </h2>
-                        <p className="text-slate-600 dark:text-slate-300 text-sm mt-1 capitalize tracking-wide">{weather[0].description}</p>
+                        <p className="text-slate-800 dark:text-slate-300 text-sm mt-1 capitalize tracking-wide">{weather[0].description}</p>
                     </div>
                     <div className="flex items-center gap-3">
                         <button
@@ -29,7 +29,7 @@ const CurrentWeather = ({ data, unit, isFavorite, onToggleFavorite }) => {
                         >
                             <span className="text-lg">{isFavorite ? '★' : '☆'}</span>
                         </button>
-                        <div className="px-3 py-1 rounded-full text-xs font-medium border border-black/10 dark:border-white/20 bg-white/40 dark:bg-white/5 backdrop-blur-md text-slate-700 dark:text-white">
+                        <div className="px-3 py-1 rounded-full text-xs font-medium border border-black/10 dark:border-white/20 bg-white/40 dark:bg-white/5 backdrop-blur-sm text-slate-700 dark:text-white">
                             LIVE
                         </div>
                     </div>
@@ -45,7 +45,7 @@ const CurrentWeather = ({ data, unit, isFavorite, onToggleFavorite }) => {
                         <div className="text-6xl font-thin text-slate-900 dark:text-white tracking-tighter">
                             {temp}<span className="text-2xl align-top opacity-60 font-normal">{unitSymbol}</span>
                         </div>
-                        <p className="text-slate-500 dark:text-slate-400 text-sm mt-1 font-light">Feels like {feelsLike}{unitSymbol}</p>
+                        <p className="text-slate-700 dark:text-slate-400 text-sm mt-1 font-light">Feels like {feelsLike}{unitSymbol}</p>
                     </div>
                 </div>
 

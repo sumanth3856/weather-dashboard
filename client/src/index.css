@@ -8,12 +8,12 @@ body {
 }
 
 .dark body {
-  background: radial-gradient(circle at 50% 0%, #1e293b 0%, #020617 100%);
+  @apply bg-slate-950;
 }
 
 /* Ethereal / Glass Utilities */
 .glass-panel {
-  @apply bg-white/60 dark:bg-white/5 backdrop-blur-md border border-black/5 dark:border-white/10 rounded-2xl shadow-xl dark:shadow-2xl transition-all duration-300;
+  @apply bg-white/60 dark:bg-transparent backdrop-blur-sm border border-black/5 dark:border-white/10 rounded-2xl shadow-xl dark:shadow-2xl transition-all duration-300;
 }
 
 .glass-panel:hover {

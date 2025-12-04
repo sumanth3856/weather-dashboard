@@ -43,14 +43,10 @@ const Sidebar = ({ currentView, onNavigate }) => {
                 />
             </nav>
 
-            <div className="p-4 border-t border-white/5">
-                <div className="flex items-center justify-center lg:justify-start gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors cursor-pointer">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 flex items-center justify-center text-xs font-bold">US</div>
-                    <div className="hidden lg:block">
-                        <p className="text-sm font-medium">User Profile</p>
-                        <p className="text-xs text-slate-400">Pro Plan</p>
-                    </div>
-                </div>
+            <div className="p-4 border-t border-black/5 dark:border-white/5">
+                <p className="text-xs text-center text-slate-600 dark:text-slate-500 font-medium">
+                    Developed by <span className="text-slate-800 dark:text-slate-300">Sumanth, ALIET</span>
+                </p>
             </div>
         </aside>
     );
@@ -59,7 +55,7 @@ const Sidebar = ({ currentView, onNavigate }) => {
 const NavItem = ({ icon, label, active, onClick }) => (
     <button
         onClick={onClick}
-        className={`flex items-center justify-center lg:justify-start gap-3 p-3 rounded-xl transition-all duration-300 group ${active ? 'bg-blue-500/10 dark:bg-white/10 text-blue-600 dark:text-white shadow-lg border border-blue-500/20 dark:border-white/10' : 'text-slate-500 dark:text-slate-400 hover:bg-black/5 dark:hover:bg-white/5 hover:text-slate-700 dark:hover:text-slate-200'}`}
+        className={`flex items-center justify-center lg:justify-start gap-3 p-3 rounded-xl transition-all duration-300 group ${active ? 'bg-blue-500/10 dark:bg-white/10 text-blue-600 dark:text-white shadow-lg border border-blue-500/20 dark:border-white/10' : 'text-slate-700 dark:text-slate-400 hover:bg-black/5 dark:hover:bg-white/5 hover:text-slate-700 dark:hover:text-slate-200'}`}
     >
         <span className="text-xl group-hover:scale-110 transition-transform">{icon}</span>
         <span className="font-medium hidden lg:block text-sm tracking-wide">{label}</span>

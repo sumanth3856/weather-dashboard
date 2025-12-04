@@ -1,116 +1,171 @@
 /* eslint-disable react-hooks/purity */
-import React, { useRef, useMemo } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { Cloud, Stars, Sparkles } from '@react-three/drei';
+import React, { useMemo, useRef } from 'react';
+import { Canvas, useThree, useFrame } from '@react-three/fiber';
+import { Cloud, Sparkles, Stars } from '@react-three/drei';
 import * as THREE from 'three';
 
-const Rain = ({ count = 1000 }) => {
-    const mesh = useRef();
+class ErrorBoundary extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = { hasError: false };
+    }
 
-    const dummy = useMemo(() => new THREE.Object3D(), []);
-    const particles = useMemo(() => {
-        const temp = [];
-        for (let i = 0; i < count; i++) {
-            const t = Math.random() * 100;
-            const speed = 0.01 + Math.random() / 200;
-            const xFactor = -50 + Math.random() * 100;
-            const zFactor = -50 + Math.random() * 100;
-            temp.push({ t, speed, xFactor, zFactor, mx: 0, my: 0 });
+    static getDerivedStateFromError(error) {
+        return { hasError: true };
+    }
+
+    componentDidCatch(error, errorInfo) {
+        console.error("WeatherScene 3D Error:", error, errorInfo);
+    }
+
+    render() {
+        if (this.state.hasError) {
+            return null;
         }
-        return temp;
-    }, [count]);
+        return this.props.children;
+    }
+}
+
+const Sun = React.memo(({ isMobile }) => {
+    const position = isMobile ? [0, 8, -20] : [15, 12, -20];
+    return (
+        <group position={position}>
+            <mesh>
+                <sphereGeometry args={[2.5, 32, 32]} />
+                <meshStandardMaterial color="#fbbf24" emissive="#f59e0b" emissiveIntensity={2} />
+            </mesh>
+            {/* Sun Glow */}
+            <mesh>
+                <sphereGeometry args={[4, 32, 32]} />
+                <meshBasicMaterial color="#fcd34d" transparent opacity={0.2} side={THREE.BackSide} />
+            </mesh>
+            <pointLight intensity={3} distance={100} decay={2} color="#fcd34d" />
+        </group>
+    );
+});
+
+const DaySky = React.memo(() => (
+    <mesh position={[0, 0, -50]}>
+        <planeGeometry args={[200, 100]} />
+        <meshBasicMaterial color="#38bdf8" /> {/* Sky Blue */}
+    </mesh>
+));
+
+const Moon = React.memo(({ isMobile }) => {
+    const meshRef = useRef();
+    const position = isMobile ? [5, 8, -20] : [20, 5, -20];
 
     useFrame(() => {
-        particles.forEach((particle, i) => {
-            let { t, speed, xFactor, zFactor } = particle;
-            t = particle.t += speed / 2;
-            const s = Math.cos(t);
-
-            // Rain motion: falling down
-            particle.my -= speed * 10;
-            if (particle.my < -50) particle.my = 50;
-
-            dummy.position.set(
-                xFactor,
-                particle.my,
-                zFactor
-            );
-            dummy.scale.set(0.1, 2, 0.1); // Elongated drops
-            dummy.rotation.set(s * 5, s * 5, s * 5);
-            dummy.updateMatrix();
-            mesh.current.setMatrixAt(i, dummy.matrix);
-        });
-        mesh.current.instanceMatrix.needsUpdate = true;
+        if (meshRef.current) {
+            meshRef.current.rotation.y += 0.005;
+            meshRef.current.rotation.x += 0.001;
+        }
     });
 
     return (
-        <instancedMesh ref={mesh} args={[null, null, count]}>
-            <boxGeometry args={[0.2, 1, 0.2]} />
-            <meshBasicMaterial color="#a5b4fc" transparent opacity={0.6} />
-        </instancedMesh>
+        <group position={position}>
+            {/* Main Moon Body */}
+            <mesh ref={meshRef}>
+                <sphereGeometry args={[1.5, 32, 32]} />
+                <meshStandardMaterial
+                    color="#fcd34d"
+                    emissive="#f59e0b"
+                    emissiveIntensity={0.5}
+                    roughness={0.8}
+                />
+            </mesh>
+            <pointLight intensity={0.8} distance={100} decay={2} color="#fcd34d" />
+        </group>
     );
-};
+});
 
-const Sun = () => {
-    return (
-        <mesh position={[15, 12, -20]}>
-            <sphereGeometry args={[2, 32, 32]} />
-            <meshStandardMaterial color="#fcd34d" emissive="#f59e0b" emissiveIntensity={2} />
-            <pointLight intensity={2} distance={100} decay={2} color="#fcd34d" />
-        </mesh>
-    );
-};
+const RealisticClouds = React.memo(({ isDay, isMobile }) => {
+    // Generate random cloud configurations
+    const clouds = useMemo(() => {
+        const count = isMobile ? 3 : 6; // Fewer clouds on mobile
+        const temp = [];
+        for (let i = 0; i < count; i++) {
+            temp.push({
+                x: (Math.random() - 0.5) * (isMobile ? 15 : 35), // Tighter spread on mobile
+                y: (Math.random() - 0.5) * 10 + (isMobile ? 5 : 2), // Higher up on mobile
+                z: -15 - Math.random() * 10, // Depth variation
+                speed: 0.1 + Math.random() * 0.1, // Random slow speeds
+                opacity: (isDay ? 0.6 : 0.5) + Math.random() * 0.2, // Random opacity
+                width: 10 + Math.random() * 10, // Random width
+            });
+        }
+        return temp;
+    }, [isDay, isMobile]);
 
-const Moon = () => {
     return (
-        <mesh position={[20, 5, -20]}>
-            <sphereGeometry args={[1.5, 32, 32]} />
-            <meshStandardMaterial color="#e2e8f0" emissive="#cbd5e1" emissiveIntensity={0.5} />
-            <pointLight intensity={0.5} distance={100} decay={2} color="#f8fafc" />
-        </mesh>
+        <>
+            {clouds.map((cloud, i) => (
+                <Cloud
+                    key={i}
+                    opacity={cloud.opacity}
+                    speed={cloud.speed}
+                    width={cloud.width}
+                    depth={1.5}
+                    segments={10}
+                    position={[cloud.x, cloud.y, cloud.z]}
+                    color="white"
+                />
+            ))}
+        </>
     );
-};
+});
 
 const SceneContent = ({ weatherCondition, isDay }) => {
-    const condition = weatherCondition?.toLowerCase() || 'clear';
-    const isRaining = condition.includes('rain') || condition.includes('drizzle');
-    const isCloudy = condition.includes('cloud');
+    const { viewport } = useThree();
+    const isMobile = viewport.width < 10;
 
-    // Common elements
-    const stars = <Stars radius={100} depth={50} count={isDay ? 1000 : 5000} factor={4} saturation={0} fade speed={1} />;
+    // Memoize configurations to prevent re-renders
+    const yellowStars = useMemo(() => (
+        <Sparkles
+            count={isMobile ? 50 : 150}
+            scale={12}
+            size={isMobile ? 4 : 6}
+            speed={0.2}
+            opacity={0.8}
+            color="#fcd34d"
+        />
+    ), [isMobile]);
 
-    if (isRaining) {
-        return (
-            <>
-                <ambientLight intensity={isDay ? 0.3 : 0.1} />
-                <pointLight position={[10, 10, 10]} intensity={isDay ? 0.5 : 0.2} />
-                <Cloud opacity={0.8} speed={0.4} width={10} depth={1.5} segments={20} position={[0, 5, -10]} color={isDay ? "#64748b" : "#1e293b"} />
-                <Rain count={2000} />
-                {!isDay && stars}
-            </>
-        );
-    }
+    const backgroundStars = useMemo(() => (
+        <Stars
+            radius={100}
+            depth={50}
+            count={500}
+            factor={4}
+            saturation={0}
+            fade
+            speed={0.5}
+        />
+    ), []);
 
-    if (isCloudy) {
-        return (
-            <>
-                <ambientLight intensity={isDay ? 0.6 : 0.2} />
-                <pointLight position={[10, 10, 10]} intensity={isDay ? 1 : 0.3} />
-                <Cloud opacity={0.7} speed={0.2} width={20} depth={2} segments={30} position={[0, 0, -15]} color={isDay ? "white" : "#475569"} />
-                {stars}
-            </>
-        );
-    }
-
-    // Clear / Sunny / Clear Night
     return (
         <>
             <ambientLight intensity={isDay ? 0.8 : 0.2} />
             <pointLight position={[10, 10, 10]} intensity={isDay ? 1.5 : 0.5} />
-            {isDay ? <Sun /> : <Moon />}
-            <Cloud opacity={isDay ? 0.3 : 0.1} speed={0.1} width={10} depth={1.5} segments={10} position={[-10, 0, -20]} color={isDay ? "white" : "#334155"} />
-            {isDay && <Sparkles count={100} scale={12} size={4} speed={0.4} opacity={0.5} color="#fcd34d" />}
-            {stars}
+
+            {isDay ? (
+                <>
+                    <Sun isMobile={isMobile} />
+                    <DaySky />
+                </>
+            ) : (
+                <Moon isMobile={isMobile} />
+            )}
+
+            {/* Realistic Cloud System */}
+            <RealisticClouds isDay={isDay} isMobile={isMobile} />
+
+            {!isDay && (
+                <>
+                    {yellowStars}
+                    {backgroundStars}
+                </>
+            )}
         </>
     );
 };
@@ -119,7 +174,9 @@ const WeatherScene = ({ weatherCondition, isDay = true }) => {
     return (
         <div className="absolute inset-0 z-0 pointer-events-none">
             <Canvas camera={{ position: [0, 0, 10], fov: 60 }}>
-                <SceneContent weatherCondition={weatherCondition} isDay={isDay} />
+                <ErrorBoundary>
+                    <SceneContent weatherCondition={weatherCondition} isDay={isDay} />
+                </ErrorBoundary>
             </Canvas>
         </div>
     );

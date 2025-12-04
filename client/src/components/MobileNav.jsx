@@ -40,10 +40,12 @@ const MobileNav = ({ currentView, onNavigate }) => {
 const NavItem = ({ icon, label, active, onClick }) => (
     <button
         onClick={onClick}
-        className={`flex flex-col items-center gap-1 ${active ? 'text-blue-600 dark:text-white' : 'text-slate-500 dark:text-slate-400'}`}
+        className={`flex flex-col items-center gap-1 transition-all duration-300 ${active ? 'text-blue-600 dark:text-blue-400 scale-110' : 'text-slate-700 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}
     >
-        <span className="text-xl">{icon}</span>
-        <span className="text-[10px] font-medium">{label}</span>
+        <div className={`p-1.5 rounded-full transition-all duration-300 ${active ? 'bg-blue-100 dark:bg-blue-900/30 shadow-sm shadow-blue-200 dark:shadow-blue-900/20' : 'bg-transparent'}`}>
+            <span className="text-xl block">{icon}</span>
+        </div>
+        <span className={`text-[10px] font-medium ${active ? 'font-bold' : ''}`}>{label}</span>
     </button>
 );
 

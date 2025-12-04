@@ -3,12 +3,25 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const NodeCache = require('node-cache');
 const { fetchCurrentWeather, fetchForecast, fetchCitySuggestions, fetchAirQuality } = require('./weatherService');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 5002;
 const cache = new NodeCache({ stdTTL: 600 }); // Cache for 10 minutes
+
+// Security Middleware
+app.use(helmet());
+
+// Rate Limiting
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // Limit each IP to 100 requests per windowMs
+    message: { error: 'Too many requests, please try again later.' }
+});
+app.use(limiter);
 
 app.use(cors());
 app.use(express.json());
@@ -42,10 +55,6 @@ app.get('/api/weather', async (req, res) => {
         if (city) {
             data = await fetchCurrentWeather(city, apiKey);
         } else {
-            // Need to export/create a fetch by coords function
-            // For now, let's update fetchCurrentWeather to handle both or create new one.
-            // Let's assume fetchCurrentWeather can handle it if we modify it.
-            // Actually, let's modify fetchCurrentWeather in weatherService.js
             data = await fetchCurrentWeather({ city, lat, lon }, apiKey);
         }
 
@@ -83,8 +92,6 @@ app.get('/api/forecast', async (req, res) => {
 
     try {
         const apiKey = process.env.WEATHER_API_KEY;
-        // Pass object if lat/lon, or string if just city (though fetchForecast now handles object)
-        // To be consistent with my change in weatherService, I can pass an object.
         const query = city ? { city } : { lat, lon };
         const data = await fetchForecast(query, apiKey);
 
@@ -151,9 +158,18 @@ app.get('/api/air_quality', async (req, res) => {
     }
 });
 
+// Global Error Handler
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({
+        error: 'Something went wrong!',
+        message: process.env.NODE_ENV === 'production' ? 'Internal Server Error' : err.message
+    });
+});
+
 if (require.main === module) {
     app.listen(port, () => {
-        console.log(`Server v2 running on port ${port}`);
+        console.log(`Server running on port ${port}`);
     });
 }
 

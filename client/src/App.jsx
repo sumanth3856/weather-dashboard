@@ -9,6 +9,8 @@ import UnitToggle from './components/UnitToggle';
 import Sidebar from './components/Sidebar';
 import MobileNav from './components/MobileNav';
 import WeatherScene from './components/WeatherScene';
+
+
 import ErrorDisplay from './components/ErrorDisplay';
 import Analytics from './components/Analytics';
 import FullMapView from './components/FullMapView';
@@ -16,6 +18,7 @@ import Settings from './components/Settings';
 
 import AirQualityCard from './components/AirQualityCard';
 import Favorites from './components/Favorites';
+import NotFound from './components/NotFound';
 
 function App() {
   const [weather, setWeather] = useState(null);
@@ -181,10 +184,11 @@ function App() {
     }
   }, []);
 
-  const isDay = weather ? (weather.dt >= weather.sys.sunrise && weather.dt < weather.sys.sunset) : true;
+  // Bind Day/Night scene directly to the theme to ensure Dark Mode always shows the Night Sky
+  const isDay = theme === 'light';
 
   return (
-    <div className="min-h-screen bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex relative overflow-hidden transition-colors duration-300">
+    <div className="min-h-screen bg-slate-100 dark:bg-transparent text-slate-900 dark:text-slate-100 flex relative overflow-hidden transition-colors duration-300">
       {/* 3D Background */}
       <WeatherScene weatherCondition={weather?.weather?.[0]?.main} isDay={isDay} />
 
@@ -200,7 +204,7 @@ function App() {
             <header className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
               <div>
                 <h1 className="text-3xl font-light tracking-tight text-slate-900 dark:text-white">Weather<span className="font-bold">Bun</span></h1>
-                <p className="text-slate-500 dark:text-slate-400 text-sm font-light"> immersive weather experience</p>
+                <p className="text-slate-700 dark:text-slate-400 text-sm font-light"> immersive weather experience</p>
               </div>
               <div className="flex items-center gap-4 w-full md:w-auto z-50">
                 <SearchBar onSearch={handleSearch} />
@@ -223,37 +227,38 @@ function App() {
               </div>
             )}
 
-            {!loading && weather && (
+            {!loading && (
               <>
-                {currentView === 'dashboard' && (
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    {/* Left Column: Current Weather & Details */}
-                    <div className="lg:col-span-1 space-y-6">
-                      <CurrentWeather
-                        data={weather}
-                        unit={unit}
-                        isFavorite={favorites.includes(weather.name)}
-                        onToggleFavorite={() => toggleFavorite(weather.name)}
-                      />
-                      <AirQualityCard data={aqi} />
+                {currentView === 'dashboard' && weather && (
+                  <>
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                      <div className="lg:col-span-2 space-y-6">
+                        <CurrentWeather
+                          data={weather}
+                          unit={unit}
+                          isFavorite={favorites.includes(weather.name)}
+                          onToggleFavorite={() => toggleFavorite(weather.name)}
+                        />
+                        <DailyForecast data={forecast} unit={unit} />
+                        <ForecastChart data={forecast} unit={unit} />
+                      </div>
+                      <div className="space-y-6">
+                        <AirQualityCard data={aqi} />
+                        <WeatherMap coord={weather.coord} />
+                      </div>
                     </div>
-
-                    {/* Right Column: Map & Forecast */}
-                    <div className="lg:col-span-2 space-y-6">
-                      <ForecastChart data={forecast} unit={unit} />
-                      <DailyForecast data={forecast} unit={unit} />
-                      <WeatherMap coord={weather.coord} city={weather.name} />
-                    </div>
-                  </div>
+                  </>
                 )}
 
-                {currentView === 'analytics' && (
-                  <Analytics data={forecast} unit={unit} />
+                {currentView === 'favorites' && (
+                  <Favorites
+                    favorites={favorites}
+                    onSelect={handleFavoriteSelect}
+                    onRemove={removeFavorite}
+                  />
                 )}
 
-                {currentView === 'map' && (
-                  <FullMapView coord={weather.coord} city={weather.name} />
-                )}
+                {currentView === 'map' && weather && <FullMapView coord={weather?.coord} city={weather?.name} />}
 
                 {currentView === 'settings' && (
                   <Settings
@@ -264,19 +269,27 @@ function App() {
                   />
                 )}
 
-                {currentView === 'favorites' && (
-                  <Favorites
-                    favorites={favorites}
-                    onSelect={handleFavoriteSelect}
-                    onRemove={removeFavorite}
-                  />
+                {currentView === 'analytics' && weather && (
+                  <Analytics data={forecast} unit={unit} />
+                )}
+
+                {/* Fallback for unknown views */}
+                {!['dashboard', 'favorites', 'map', 'settings', 'analytics'].includes(currentView) && (
+                  <NotFound onHome={() => setCurrentView('dashboard')} />
                 )}
               </>
             )}
+
+            {/* Mobile Trademark */}
+            <div className="md:hidden mt-12 pb-6 text-center">
+              <p className="text-xs text-slate-600 dark:text-slate-500 font-medium">
+                Developed by <span className="text-slate-800 dark:text-slate-300">Sumanth, ALIET</span>
+              </p>
+            </div>
           </div>
         </main>
-      </div>
-    </div>
+      </div >
+    </div >
   );
 }
 
