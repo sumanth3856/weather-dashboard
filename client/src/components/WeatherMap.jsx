@@ -17,9 +17,7 @@ L.Marker.prototype.options.icon = DefaultIcon;
 
 const ChangeView = ({ center }) => {
     const map = useMap();
-    map.flyTo(center, 10, {
-        duration: 2
-    });
+    map.flyTo(center, 10, { duration: 2 });
     return null;
 };
 
@@ -29,30 +27,38 @@ const WeatherMap = ({ coord, city, className }) => {
     const position = [coord.lat, coord.lon];
 
     return (
-        <div className={`glass-panel p-0 overflow-hidden relative group animate-fade-in ${className || 'h-80'}`} style={{ animationDelay: '0.2s' }}>
-            <div className="absolute top-4 left-4 z-[400] bg-white/40 dark:bg-white/10 backdrop-blur-md px-4 py-1.5 rounded-full border border-black/5 dark:border-white/20 shadow-lg">
-                <span className="text-xs text-slate-900 dark:text-white font-medium tracking-wide flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-green-500 dark:bg-green-400 animate-pulse"></span>
+        <div className={`premium-panel p-1 overflow-hidden relative group animate-fade-in ${className || 'h-80'}`} style={{ animationDelay: '0.2s' }}>
+
+            {/* LIVE MAP badge — top RIGHT */}
+            <div className="absolute top-3 right-3 z-[400] bg-white/90 dark:bg-[#121214]/90 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-white/10 shadow-sm">
+                <span className="text-xs text-brand-900 dark:text-white font-bold tracking-wide flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse flex-shrink-0"></span>
                     LIVE MAP
                 </span>
             </div>
 
-            <MapContainer center={position} zoom={10} scrollWheelZoom={false} style={{ height: '100%', width: '100%' }}>
-                <TileLayer
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    className="opacity-80 grayscale-[20%] contrast-[1.1]"
-                />
-                <ChangeView center={position} />
-                <Marker position={position}>
-                    <Popup className="glass-popup">
-                        <div className="font-medium text-slate-800">{city}</div>
-                    </Popup>
-                </Marker>
-            </MapContainer>
-
-            {/* Overlay gradient for smooth integration */}
-            <div className="absolute inset-0 pointer-events-none z-[399] shadow-[inset_0_0_50px_rgba(0,0,0,0.2)]"></div>
+            <div className="h-full w-full rounded-xl overflow-hidden relative z-[390]">
+                <MapContainer
+                    center={position}
+                    zoom={10}
+                    scrollWheelZoom={false}
+                    style={{ height: '100%', width: '100%' }}
+                >
+                    {/* Full-color OpenStreetMap tiles — no grayscale filter */}
+                    <TileLayer
+                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    />
+                    <ChangeView center={position} />
+                    <Marker position={position}>
+                        <Popup>
+                            <div className="font-bold text-slate-800 font-sans">{city}</div>
+                        </Popup>
+                    </Marker>
+                </MapContainer>
+                {/* Subtle vignette around edges for panel blending */}
+                <div className="absolute inset-0 pointer-events-none z-[399] shadow-[inset_0_0_32px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_0_32px_rgba(0,0,0,0.3)] rounded-xl"></div>
+            </div>
         </div>
     );
 };

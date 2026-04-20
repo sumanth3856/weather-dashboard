@@ -8,8 +8,7 @@ import {
     LineElement,
     Title,
     Tooltip,
-    Legend,
-    Filler
+    Legend
 } from 'chart.js';
 
 ChartJS.register(
@@ -19,14 +18,12 @@ ChartJS.register(
     LineElement,
     Title,
     Tooltip,
-    Legend,
-    Filler
+    Legend
 );
 
-const TrendChart = ({ data, dataKey, label, unit, color = '#3b82f6' }) => {
+const TrendChart = ({ data, dataKey, label, unit, color = '#0ea5e9' }) => {
     if (!data || !data.list) return null;
 
-    // Get next 8 data points (24 hours approx)
     const slice = data.list.slice(0, 8);
 
     const labels = slice.map(item => {
@@ -35,7 +32,6 @@ const TrendChart = ({ data, dataKey, label, unit, color = '#3b82f6' }) => {
     });
 
     const values = slice.map(item => {
-        // Navigate nested object path (e.g., 'main.humidity')
         return dataKey.split('.').reduce((obj, key) => obj && obj[key], item);
     });
 
@@ -46,26 +42,15 @@ const TrendChart = ({ data, dataKey, label, unit, color = '#3b82f6' }) => {
                 label: `${label} (${unit})`,
                 data: values,
                 borderColor: color,
-                backgroundColor: (context) => {
-                    const ctx = context.chart.ctx;
-                    const gradient = ctx.createLinearGradient(0, 0, 0, 200);
-                    // Convert hex to rgba for gradient
-                    // Simple hex to rgb conversion
-                    const r = parseInt(color.slice(1, 3), 16);
-                    const g = parseInt(color.slice(3, 5), 16);
-                    const b = parseInt(color.slice(5, 7), 16);
-
-                    gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.2)`);
-                    gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
-                    return gradient;
-                },
+                backgroundColor: 'transparent',
                 pointBackgroundColor: color,
                 pointBorderColor: '#ffffff',
                 pointBorderWidth: 2,
-                pointRadius: 3,
+                pointRadius: 4,
                 pointHoverRadius: 6,
-                tension: 0.4,
-                fill: true,
+                tension: 0.3,
+                fill: false,
+                borderWidth: 3,
             },
         ],
     };
@@ -76,9 +61,13 @@ const TrendChart = ({ data, dataKey, label, unit, color = '#3b82f6' }) => {
         plugins: {
             legend: { display: false },
             tooltip: {
-                backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                backgroundColor: '#121214',
                 titleColor: '#fff',
+                titleFont: { family: 'Inter', weight: 'bold' },
                 bodyColor: '#fff',
+                bodyFont: { family: 'Inter', weight: 'medium' },
+                borderColor: 'rgba(255,255,255,0.1)',
+                borderWidth: 1,
                 padding: 12,
                 cornerRadius: 8,
                 displayColors: false,
@@ -91,18 +80,18 @@ const TrendChart = ({ data, dataKey, label, unit, color = '#3b82f6' }) => {
             x: {
                 grid: { display: false },
                 ticks: {
-                    color: '#64748b',
-                    font: { family: 'sans-serif', size: 11 }
+                    color: '#a1a1aa',
+                    font: { family: 'Inter', size: 11, weight: 'bold' }
                 }
             },
             y: {
                 grid: {
-                    color: 'rgba(0, 0, 0, 0.05)',
+                    color: 'rgba(161, 161, 170, 0.1)',
                     drawBorder: false,
                 },
                 ticks: {
-                    color: '#64748b',
-                    font: { family: 'sans-serif', size: 11 }
+                    color: '#a1a1aa',
+                    font: { family: 'Inter', size: 11, weight: 'bold' }
                 }
             }
         }

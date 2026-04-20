@@ -8,7 +8,6 @@ import DailyForecast from './components/DailyForecast';
 import UnitToggle from './components/UnitToggle';
 import Sidebar from './components/Sidebar';
 import MobileNav from './components/MobileNav';
-import WeatherScene from './components/WeatherScene';
 
 
 import ErrorDisplay from './components/ErrorDisplay';
@@ -19,6 +18,8 @@ import Settings from './components/Settings';
 import AirQualityCard from './components/AirQualityCard';
 import Favorites from './components/Favorites';
 import NotFound from './components/NotFound';
+import SkeletonLoader from './components/SkeletonLoader';
+import SunriseSunset from './components/SunriseSunset';
 
 function App() {
   const [weather, setWeather] = useState(null);
@@ -87,7 +88,7 @@ function App() {
       const weatherRes = await axios.get(url);
 
       if (weatherRes.data.notFound || weatherRes.data.error) {
-        setError('City not found. Please try another location.');
+        setError('city not found');
         setWeather(null);
         setForecast(null);
         return;
@@ -129,9 +130,15 @@ function App() {
       }
     } catch (err) {
       if (err.response && err.response.status === 404) {
-        setError('City not found. Please try another location.');
+        setError('city not found');
+      } else if (err.response && err.response.status === 401) {
+        setError('api key unauthorized');
+      } else if (err.response && err.response.status === 429) {
+        setError('429 too many requests rate limit');
+      } else if (!err.response) {
+        setError('network connection failed');
       } else {
-        setError(err.response?.data?.error || 'Failed to fetch data');
+        setError('generic server error');
       }
       setWeather(null);
       setForecast(null);
@@ -148,12 +155,12 @@ function App() {
           const { latitude, longitude } = position.coords;
           fetchWeatherData({ lat: latitude, lon: longitude });
         }, (err) => {
-          console.error(err);
-          setError('Location access denied or unavailable.');
+          console.error('Geolocation error:', err.code);
+          setError('location access denied by browser');
           setLoading(false);
         });
       } else {
-        setError('Geolocation is not supported by your browser.');
+        setError('geolocation is not supported by your browser');
       }
     } else {
       fetchWeatherData(query);
@@ -184,14 +191,8 @@ function App() {
     }
   }, []);
 
-  // Bind Day/Night scene directly to the theme to ensure Dark Mode always shows the Night Sky
-  const isDay = theme === 'light';
-
   return (
-    <div className="min-h-screen bg-slate-100 dark:bg-transparent text-slate-900 dark:text-slate-100 flex relative overflow-hidden transition-colors duration-300">
-      {/* 3D Background */}
-      <WeatherScene weatherCondition={weather?.weather?.[0]?.main} isDay={isDay} />
-
+    <div className="min-h-screen bg-brand-50 dark:bg-[#0a0a0c] text-slate-900 dark:text-slate-200 flex relative overflow-hidden transition-colors duration-300">
       {/* Content Overlay */}
       <div className="absolute inset-0 z-10 flex pointer-events-none">
         <div className="pointer-events-auto h-full">
@@ -202,21 +203,17 @@ function App() {
         <main className="flex-1 p-4 md:p-8 pb-24 md:pb-8 overflow-y-auto h-screen pointer-events-auto w-full">
           <div className="max-w-7xl mx-auto">
             <header className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-              <div>
-                <h1 className="text-3xl font-light tracking-tight text-slate-900 dark:text-white">Weather<span className="font-bold">Bun</span></h1>
-                <p className="text-slate-700 dark:text-slate-400 text-sm font-light"> immersive weather experience</p>
+              <div className="text-center md:text-left">
+                <h1 className="text-3xl font-bold tracking-tight text-brand-900 dark:text-white">Weather<span className="text-accent">Bun</span></h1>
+                <p className="text-brand-500 dark:text-brand-300 text-sm font-medium mt-1">Immersive weather intelligence</p>
               </div>
-              <div className="flex items-center gap-4 w-full md:w-auto z-50">
+              <div className="flex items-center gap-3 w-full md:w-auto z-50">
                 <SearchBar onSearch={handleSearch} />
                 <UnitToggle unit={unit} onToggle={toggleUnit} />
               </div>
             </header>
 
-            {loading && (
-              <div className="flex justify-center items-center h-64">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white/20"></div>
-              </div>
-            )}
+            {loading && <SkeletonLoader />}
 
             {error && (
               <div className="flex justify-center mb-8">
@@ -231,20 +228,28 @@ function App() {
               <>
                 {currentView === 'dashboard' && weather && (
                   <>
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-                      <div className="lg:col-span-2 space-y-6">
-                        <CurrentWeather
-                          data={weather}
-                          unit={unit}
-                          isFavorite={favorites.includes(weather.name)}
-                          onToggleFavorite={() => toggleFavorite(weather.name)}
-                        />
-                        <DailyForecast data={forecast} unit={unit} />
-                        <ForecastChart data={forecast} unit={unit} />
-                      </div>
-                      <div className="space-y-6">
+                    {/* Row 1 — full-width weather hero */}
+                    <div className="mb-6 animate-fade-in">
+                      <CurrentWeather
+                        data={weather}
+                        unit={unit}
+                        isFavorite={favorites.includes(weather.name)}
+                        onToggleFavorite={() => toggleFavorite(weather.name)}
+                      />
+                    </div>
+
+                    {/* Row 2 — full-width 5-day forecast */}
+                    <div className="mb-6 animate-fade-in" style={{ animationDelay: '60ms' }}>
+                      <DailyForecast data={forecast} unit={unit} />
+                    </div>
+
+                    {/* Row 3 — 2-col: AQI | Solar Arc */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+                      <div className="animate-fade-in" style={{ animationDelay: '120ms' }}>
                         <AirQualityCard data={aqi} />
-                        <WeatherMap coord={weather.coord} />
+                      </div>
+                      <div className="animate-fade-in" style={{ animationDelay: '160ms' }}>
+                        <SunriseSunset data={weather} />
                       </div>
                     </div>
                   </>
@@ -280,12 +285,7 @@ function App() {
               </>
             )}
 
-            {/* Mobile Trademark */}
-            <div className="md:hidden mt-12 pb-6 text-center">
-              <p className="text-xs text-slate-600 dark:text-slate-500 font-medium">
-                Developed by <span className="text-slate-800 dark:text-slate-300">Sumanth, ALIET</span>
-              </p>
-            </div>
+
           </div>
         </main>
       </div >

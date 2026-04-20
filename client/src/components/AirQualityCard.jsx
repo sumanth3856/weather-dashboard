@@ -1,84 +1,84 @@
 import React from 'react';
+import { Wind } from 'lucide-react';
+
+const AQI_CONFIG = {
+    1: { label: 'Good',      desc: 'Air is clean — safe for all outdoor activities.',   color: 'text-emerald-500 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-900/20', border: 'border-emerald-200 dark:border-emerald-700/50', stroke: '#10b981' },
+    2: { label: 'Fair',      desc: 'Acceptable air quality for most people.',            color: 'text-amber-500 dark:text-amber-400',   bg: 'bg-amber-50 dark:bg-amber-900/20',   border: 'border-amber-200 dark:border-amber-700/50',   stroke: '#f59e0b' },
+    3: { label: 'Moderate',  desc: 'Sensitive groups may experience minor effects.',     color: 'text-orange-500 dark:text-orange-400', bg: 'bg-orange-50 dark:bg-orange-900/20', border: 'border-orange-200 dark:border-orange-700/50', stroke: '#f97316' },
+    4: { label: 'Poor',      desc: 'Health effects possible. Limit outdoor exposure.',   color: 'text-rose-500 dark:text-rose-400',     bg: 'bg-rose-50 dark:bg-rose-900/20',     border: 'border-rose-200 dark:border-rose-700/50',     stroke: '#f43f5e' },
+    5: { label: 'Very Poor', desc: 'Serious health risk. Avoid outdoor activity.',       color: 'text-purple-500 dark:text-purple-400', bg: 'bg-purple-50 dark:bg-purple-900/20', border: 'border-purple-200 dark:border-purple-700/50', stroke: '#a855f7' },
+};
+
+// Circumference for r=26 gauge circle
+const CIRC = 2 * Math.PI * 26; // ≈ 163.4
 
 const AirQualityCard = ({ data }) => {
     if (!data || !data.list || data.list.length === 0) return null;
 
     const aqi = data.list[0].main.aqi;
-    const components = data.list[0].components;
-
-    const getAQIStatus = (aqi) => {
-        switch (aqi) {
-            case 1: return { label: 'Good', color: 'text-green-400', bg: 'bg-green-400' };
-            case 2: return { label: 'Fair', color: 'text-yellow-400', bg: 'bg-yellow-400' };
-            case 3: return { label: 'Moderate', color: 'text-orange-400', bg: 'bg-orange-400' };
-            case 4: return { label: 'Poor', color: 'text-red-400', bg: 'bg-red-400' };
-            case 5: return { label: 'Very Poor', color: 'text-purple-400', bg: 'bg-purple-400' };
-            default: return { label: 'Unknown', color: 'text-slate-400', bg: 'bg-slate-400' };
-        }
-    };
-
-    const status = getAQIStatus(aqi);
+    const c   = data.list[0].components;
+    const cfg = AQI_CONFIG[aqi] || { label: 'Unknown', desc: '', color: 'text-slate-500', bg: 'bg-slate-50', border: 'border-slate-200', stroke: '#94a3b8' };
+    const dashOffset = CIRC - (CIRC * (aqi / 5));
 
     return (
-        <div className="glass-panel p-6 animate-fade-in">
+        <div className="premium-panel p-5 animate-fade-in h-full flex flex-col">
+
+            {/* Header */}
             <div className="flex items-center justify-between mb-4">
-                <h3 className="text-slate-900 dark:text-white font-light text-lg flex items-center gap-2">
-                    <span>🌍</span> Air Quality
+                <h3 className="text-sm font-bold text-brand-900 dark:text-white flex items-center gap-2 tracking-tight">
+                    <Wind className="w-4 h-4 text-accent" strokeWidth={2} />
+                    Air Quality
                 </h3>
-                <span className={`px-3 py-1 rounded-full text-xs font-bold bg-white/40 dark:bg-white/10 ${status.color} border border-black/5 dark:border-white/10`}>
-                    {status.label}
+                <span className={`px-2.5 py-1 rounded-md text-[11px] font-bold ${cfg.bg} ${cfg.color} border ${cfg.border}`}>
+                    {cfg.label}
                 </span>
             </div>
 
-            <div className="flex items-center gap-4 mb-6">
-                <div className="relative w-16 h-16 flex items-center justify-center">
-                    <svg className="w-full h-full transform -rotate-90">
-                        <circle
-                            cx="32"
-                            cy="32"
-                            r="28"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                            fill="transparent"
-                            className="text-slate-200 dark:text-slate-700"
-                        />
-                        <circle
-                            cx="32"
-                            cy="32"
-                            r="28"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                            fill="transparent"
-                            strokeDasharray={175.93}
-                            strokeDashoffset={175.93 - (175.93 * (aqi / 5))}
-                            className={`${status.color} transition-all duration-1000 ease-out`}
-                        />
+            {/* Gauge + info */}
+            <div className="flex items-center gap-4 mb-5">
+                {/* SVG gauge — r=26, 64×64 */}
+                <div className="relative w-16 h-16 flex-shrink-0">
+                    <svg viewBox="0 0 64 64" className="-rotate-90 w-full h-full">
+                        {/* Track */}
+                        <circle cx="32" cy="32" r="26" fill="none"
+                            stroke="currentColor" strokeWidth="5"
+                            className="text-zinc-100 dark:text-white/5" />
+                        {/* Progress */}
+                        <circle cx="32" cy="32" r="26" fill="none"
+                            stroke={cfg.stroke} strokeWidth="5"
+                            strokeLinecap="round"
+                            strokeDasharray={CIRC}
+                            strokeDashoffset={dashOffset}
+                            className="transition-all duration-1000 ease-out" />
                     </svg>
-                    <span className={`absolute text-2xl font-bold ${status.color}`}>{aqi}</span>
+                    <span className={`absolute inset-0 flex items-center justify-center text-xl font-black ${cfg.color}`}>
+                        {aqi}
+                    </span>
                 </div>
-                <div>
-                    <p className="text-slate-500 dark:text-slate-400 text-sm">Air Quality Index</p>
-                    <p className="text-xs text-slate-400 dark:text-slate-500">Scale: 1 (Good) - 5 (Very Poor)</p>
+
+                <div className="min-w-0">
+                    <p className="text-sm font-bold text-brand-900 dark:text-white leading-tight">Air Quality Index</p>
+                    <p className="text-xs text-brand-400 dark:text-brand-500 font-medium mt-1 leading-snug">{cfg.desc}</p>
                 </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-2">
-                <Pollutant label="PM2.5" value={components.pm2_5} unit="µg/m³" />
-                <Pollutant label="PM10" value={components.pm10} unit="µg/m³" />
-                <Pollutant label="O₃" value={components.o3} unit="µg/m³" />
-                <Pollutant label="NO₂" value={components.no2} unit="µg/m³" />
-                <Pollutant label="SO₂" value={components.so2} unit="µg/m³" />
-                <Pollutant label="CO" value={components.co} unit="µg/m³" />
+            {/* Pollutants grid */}
+            <div className="grid grid-cols-3 gap-2 mt-auto">
+                <Pollutant label="PM2.5" value={c.pm2_5?.toFixed(1)} />
+                <Pollutant label="PM10"  value={c.pm10?.toFixed(1)} />
+                <Pollutant label="O₃"    value={c.o3?.toFixed(1)} />
+                <Pollutant label="NO₂"   value={c.no2?.toFixed(1)} />
+                <Pollutant label="SO₂"   value={c.so2?.toFixed(1)} />
+                <Pollutant label="CO"    value={c.co?.toFixed(0)} />
             </div>
         </div>
     );
 };
 
-const Pollutant = ({ label, value, unit }) => (
-    <div className="bg-white/40 dark:bg-white/5 rounded-lg p-2 text-center border border-black/5 dark:border-white/5">
-        <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">{label}</p>
-        <p className="text-sm font-medium text-slate-900 dark:text-white">{value}</p>
-        <p className="text-[10px] text-slate-400 dark:text-slate-500">{unit}</p>
+const Pollutant = ({ label, value }) => (
+    <div className="bg-zinc-50 dark:bg-[#18181b] rounded-xl p-2.5 text-center border border-zinc-200 dark:border-white/5 hover:border-zinc-300 dark:hover:border-white/10 transition-colors">
+        <p className="label-caps mb-1">{label}</p>
+        <p className="text-sm font-bold text-brand-900 dark:text-white tabular-nums">{value ?? '—'}</p>
     </div>
 );
 

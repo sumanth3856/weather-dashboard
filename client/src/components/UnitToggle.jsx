@@ -1,25 +1,26 @@
 import React from 'react';
 
-const UnitToggle = ({ unit, onToggle }) => {
-    return (
-        <button
-            onClick={onToggle}
-            className="flex items-center bg-white/5 border border-white/10 rounded-full p-1 cursor-pointer hover:bg-white/10 transition-colors backdrop-blur-md"
-        >
+const UnitToggle = ({ unit, onToggle }) => (
+    <button
+        onClick={onToggle}
+        aria-label="Toggle Temperature Unit"
+        className="flex items-center p-1 gap-0.5 bg-zinc-100 dark:bg-[#18181b] border border-zinc-200 dark:border-white/8 rounded-lg cursor-pointer transition-colors shadow-sm"
+    >
+        {['metric', 'imperial'].map((u) => (
             <span
-                className={`px-4 py-1.5 rounded-full text-xs font-medium transition-all duration-300 ${unit === 'metric' ? 'bg-white text-slate-900 shadow-lg' : 'text-slate-400 hover:text-white'
-                    }`}
+                key={u}
+                className={`
+                    px-3 py-1.5 rounded-md text-xs font-bold transition-all duration-200 select-none
+                    ${unit === u
+                        ? 'bg-white dark:bg-white/10 text-slate-900 dark:text-white shadow-sm border border-zinc-200 dark:border-white/8 scale-[1.02]'
+                        : 'text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+                    }
+                `}
             >
-                °C
+                {u === 'metric' ? '°C' : '°F'}
             </span>
-            <span
-                className={`px-4 py-1.5 rounded-full text-xs font-medium transition-all duration-300 ${unit === 'imperial' ? 'bg-white text-slate-900 shadow-lg' : 'text-slate-400 hover:text-white'
-                    }`}
-            >
-                °F
-            </span>
-        </button>
-    );
-};
+        ))}
+    </button>
+);
 
 export default UnitToggle;

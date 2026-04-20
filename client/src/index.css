@@ -1,59 +1,108 @@
+/* ── Google Fonts: Inter ── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-body {
-  @apply bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans antialiased transition-colors duration-300;
-  min-height: 100vh;
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  body {
+    @apply bg-brand-50 dark:bg-[#0a0a0c] text-slate-900 dark:text-slate-200 antialiased transition-colors duration-300;
+    min-height: 100vh;
+    font-feature-settings: "cv11", "ss01";
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply tracking-tight;
+  }
 }
 
-.dark body {
-  @apply bg-slate-950;
+/* ── Design Tokens ── */
+@layer components {
+
+  /* Card surface */
+  .premium-panel {
+    @apply bg-white dark:bg-[#121214] border border-zinc-200 dark:border-white/5 rounded-2xl shadow-sm transition-all duration-200;
+  }
+  .premium-panel:hover {
+    @apply border-zinc-300 dark:border-white/10;
+  }
+
+  /* Section labels — "WIND SPEED", "SUNRISE" etc. */
+  .label-caps {
+    @apply text-[10px] font-bold uppercase tracking-[0.14em] text-brand-400 dark:text-brand-500;
+  }
+
+  /* Stat values — temperatures, speeds */
+  .stat-value {
+    @apply text-lg font-bold tabular-nums text-brand-900 dark:text-white;
+  }
+
+  /* Buttons */
+  .minimal-btn {
+    @apply px-4 py-2 rounded-lg bg-zinc-100 dark:bg-white/5 hover:bg-zinc-200 dark:hover:bg-white/10 border border-transparent dark:border-white/5 text-slate-700 dark:text-slate-300 transition-colors font-medium text-sm focus:outline-none focus:ring-2 focus:ring-accent/50;
+  }
+  .active-btn {
+    @apply bg-zinc-900 dark:bg-white dark:text-zinc-900 text-white shadow-sm border-transparent;
+  }
+
+  /* Toggle switch — shared by dark mode / settings */
+  .toggle-track {
+    @apply relative w-11 h-6 rounded-full transition-colors duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-accent/40;
+  }
+  .toggle-thumb {
+    @apply absolute top-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-all duration-200;
+  }
+
+  /* Legacy alias */
+  .glass-panel { @apply premium-panel; }
 }
 
-/* Ethereal / Glass Utilities */
-.glass-panel {
-  @apply bg-white/60 dark:bg-transparent backdrop-blur-sm border border-black/5 dark:border-white/10 rounded-2xl shadow-xl dark:shadow-2xl transition-all duration-300;
-}
-
-.glass-panel:hover {
-  @apply bg-white/80 dark:bg-white/10 border-black/10 dark:border-white/20 transform scale-[1.01];
-}
-
-.minimal-btn {
-  @apply px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 transition-all duration-300 font-medium text-sm;
-}
-
-.active-btn {
-  @apply bg-white/20 border-white/30 text-white shadow-lg shadow-white/10;
-}
-
-/* Animations */
+/* ── Animations ── */
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
-
 .animate-fade-in {
-  animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+  animation: fadeIn 0.4s ease-out forwards;
 }
 
-/* Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
+/* Stagger children */
+.stagger-children > * {
+  opacity: 0;
+  animation: fadeIn 0.38s ease-out forwards;
+}
+.stagger-children > *:nth-child(1) { animation-delay:   0ms; }
+.stagger-children > *:nth-child(2) { animation-delay:  55ms; }
+.stagger-children > *:nth-child(3) { animation-delay: 110ms; }
+.stagger-children > *:nth-child(4) { animation-delay: 165ms; }
+.stagger-children > *:nth-child(5) { animation-delay: 220ms; }
+
+/* ── Skeleton Shimmer ── */
+@keyframes shimmer {
+  0%   { background-position: -700px 0; }
+  100% { background-position:  700px 0; }
+}
+.skeleton-shimmer {
+  background: linear-gradient(90deg, #e4e7eb 25%, #f0f2f5 50%, #e4e7eb 75%);
+  background-size: 700px 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+.dark .skeleton-shimmer {
+  background: linear-gradient(90deg, #1c1c1e 25%, #27272a 50%, #1c1c1e 75%);
+  background-size: 700px 100%;
 }
 
-::-webkit-scrollbar-track {
-  @apply bg-transparent;
-}
-
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-  @apply bg-white/10 rounded-full hover:bg-white/20;
+  @apply bg-zinc-200 dark:bg-zinc-800 rounded-full;
+}
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-zinc-300 dark:bg-zinc-700;
 }
